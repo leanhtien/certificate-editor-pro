@@ -17,6 +17,15 @@ The project is designed to be simple, portable, and useful for schools, training
 
 ---
 
+## Giới thiệu
+
+Certificate Editor Pro là công cụ thiết kế chứng nhận miễn phí chạy trực tiếp trên trình duyệt.  
+Công cụ hỗ trợ kéo thả, chỉnh font tiếng Việt, upload background/logo, thêm line hoa sen, lưu layout và xuất ảnh hàng loạt.
+
+Dự án được phát triển miễn phí bởi **Jimmy Lee** với mong muốn hỗ trợ cộng đồng tạo chứng nhận nhanh, đẹp và dễ sử dụng.
+
+---
+
 ## Demo
 
 
@@ -158,3 +167,10 @@ See the `LICENSE` file for details.
 This tool is provided as-is, without any warranty.
 
 Users are responsible for checking the accuracy of certificate content, organization names, signatures, seals, and exported files before publishing or printing.
+
+---
+
+## Privacy
+
+Certificate Editor Pro runs directly in your browser.  
+Your uploaded images, names, and layout data are processed locally in the browser and are not sent to any server by default.
