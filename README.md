@@ -56,16 +56,3 @@ License
 MIT License
 
 ---
-
-## 4. Mô tả ngắn
-
-### Tiếng Anh
-
-```text
-Certificate Editor Pro is a free browser-based certificate design tool with drag-and-drop editing, Vietnamese font support, custom backgrounds, decorative lotus lines, and batch PNG export.
-```
-### Tiếng Việt
-
-```text
-Certificate Editor Pro là công cụ thiết kế chứng nhận miễn phí chạy trực tiếp trên trình duyệt, hỗ trợ kéo thả, chỉnh font tiếng Việt, upload background/logo, thêm line hoa sen và xuất ảnh hàng loạt.
-```
