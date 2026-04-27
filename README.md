@@ -43,6 +43,7 @@ Example:
 Nguyễn Văn A
 Trần Thị B
 Lê Văn C
+```
 
 The tool will automatically generate one certificate per name.
 Donation
