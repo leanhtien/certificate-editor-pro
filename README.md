@@ -28,7 +28,6 @@ Dự án được phát triển miễn phí bởi **Jimmy Lee** với mong muố
 
 ## Demo
 
-
 ```text
 https://leanhtien.github.io/certificate-editor-pro/
 ```
