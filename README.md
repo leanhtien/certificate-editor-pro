@@ -57,7 +57,7 @@ MIT License
 
 ---
 
-## 4. Mô tả ngắn để ghim ở repo / social post
+## 4. Mô tả ngắn
 
 ### Tiếng Anh
 
