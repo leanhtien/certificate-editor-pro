@@ -125,56 +125,6 @@ This is useful when you want to:
 
 ---
 
-## Recommended File Structure
-
-```text
-certificate-editor-pro/
-├── index.html
-├── README.md
-└── LICENSE
-```
-
-For a more organized version:
-
-```text
-certificate-editor-pro/
-├── index.html
-├── README.md
-├── LICENSE
-├── assets/
-│   ├── screenshots/
-│   └── backgrounds/
-└── docs/
-    └── usage-guide.md
-```
-
----
-
-## GitHub Pages Deployment
-
-You can publish this project for free using GitHub Pages.
-
-Steps:
-
-1. Create a public GitHub repository.
-2. Upload `index.html`, `README.md`, and `LICENSE`.
-3. Go to **Settings**.
-4. Go to **Pages**.
-5. Under **Build and deployment**, select:
-   - Source: `Deploy from a branch`
-   - Branch: `main`
-   - Folder: `/root`
-6. Save.
-7. Wait for GitHub Pages to generate your website link.
-
-The website URL will look like this:
-
-```text
-https://YOUR_USERNAME.github.io/certificate-editor-pro/
-```
-
----
-
 ## Donation
 
 This project is free to use.
