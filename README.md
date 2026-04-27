@@ -19,13 +19,10 @@ The project is designed to be simple, portable, and useful for schools, training
 
 ## Demo
 
-After enabling GitHub Pages, the app can be accessed at:
 
 ```text
-https://YOUR_USERNAME.github.io/certificate-editor-pro/
+https://leanhtien.github.io/certificate-editor-pro/
 ```
-
-Replace `YOUR_USERNAME` with your GitHub username.
 
 ---
 
