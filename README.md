@@ -472,37 +472,6 @@ certificate-editor-pro/
 
 ---
 
-## GitHub Pages Deployment
-
-You can publish this project for free using GitHub Pages.
-
-Steps:
-
-1. Create a public GitHub repository.
-2. Upload `index.html`, `README.md`, and `LICENSE`.
-3. Go to **Settings**.
-4. Go to **Pages**.
-5. Under **Build and deployment**, select:
-   - Source: `Deploy from a branch`
-   - Branch: `main`
-   - Folder: `/root`
-6. Save.
-7. Wait for GitHub Pages to generate your website link.
-
-The website URL will look like this:
-
-```text
-https://YOUR_USERNAME.github.io/certificate-editor-pro/
-```
-
-Current demo:
-
-```text
-https://leanhtien.github.io/certificate-editor-pro/
-```
-
----
-
 ## Browser and Internet Requirements
 
 The app can be opened directly from a local HTML file.
