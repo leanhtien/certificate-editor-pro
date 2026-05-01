@@ -117,6 +117,12 @@ https://leanhtien.github.io/certificate-editor-pro/
   - Raised shadow
   - Seal shadow
   - Signature shadow
+- Border / mask options:
+  - Border radius / bo góc
+  - Circle mask / mask hình tròn
+  - Image border / viền ảnh
+  - Border color / màu viền
+  - Border width / độ dày viền
 - Reset all image adjustments
 
 ### Decorative lotus line library
@@ -286,9 +292,51 @@ Recommended settings:
 ```text
 Background removal: optional
 Crop: Crop sát chủ thể
+Mask: Mask hình tròn
+Border: enabled, light color, thin border
 Shadow: Soft shadow
 Brightness / Contrast: adjust lightly
 ```
+
+### Avatar / student photo
+
+Recommended settings:
+
+```text
+Mask: Mask hình tròn
+Border width: 2–6px
+Border color: white, gold, or brand color
+Shadow: Soft shadow
+Keep aspect ratio: enabled
+```
+
+---
+
+## Border / Rounded Corner / Circle Mask
+
+The editor supports image border and mask options for portraits, avatars, logos, and organization marks.
+
+Available options:
+
+- **Bo góc**: rounds the image corners.
+- **Mask hình tròn**: converts the image into a circular mask.
+- **Viền ảnh**: enables an image border.
+- **Màu viền**: changes the border color.
+- **Độ dày viền**: adjusts the border thickness.
+
+### Recommended use cases
+
+- Student portrait
+- Speaker portrait
+- Organization logo
+- Avatar-style certificate profile image
+- Circular badge or seal-style visual
+
+### Notes
+
+- When **Mask hình tròn** is enabled, the image may be forced into a square frame so the circle mask renders correctly.
+- These image settings are saved inside the layout JSON.
+- Decorative SVG line objects should generally not use circle mask or image border controls.
 
 ---
 
@@ -374,6 +422,7 @@ This is useful when you want to:
 - Font settings
 - Text effects
 - Image editing settings
+- Border radius / circle mask / image border settings
 - Transparent image state
 - Original image and processed image when available
 - Export settings
@@ -432,12 +481,13 @@ For professional certificate production:
 6. Use **Tách nền AI** for signatures, seals, or logos if needed.
 7. Use **Crop sát chủ thể** after background removal.
 8. Adjust image blend mode and shadow if needed.
-9. Save the layout as JSON.
-10. Upload Excel / CSV / TXT data.
-11. Map data columns to certificate text objects.
-12. Preview the data.
-13. Export all certificates as ZIP.
-14. Review output files before printing, publishing, or sending.
+9. For portraits or avatars, use **Mask hình tròn**, **Viền ảnh**, and **Bo góc** when appropriate.
+10. Save the layout as JSON.
+11. Upload Excel / CSV / TXT data.
+12. Map data columns to certificate text objects.
+13. Preview the data.
+14. Export all certificates as ZIP.
+15. Review output files before printing, publishing, or sending.
 
 ---
 
@@ -471,6 +521,29 @@ certificate-editor-pro/
 ```
 
 ---
+
+
+
+## Version Notes — Latest Image Editing Upgrade
+
+The latest version adds professional image controls for certificate production:
+
+- AI background removal
+- Crop sát chủ thể
+- Rotate
+- Flip horizontal / vertical
+- Brightness
+- Contrast
+- Saturation
+- Blend mode
+- Shadow presets
+- Border radius / bo góc
+- Circle mask / mask hình tròn
+- Image border / viền ảnh
+- Border color / màu viền
+- Border width / độ dày viền
+
+These controls are shown only when an image object is selected.
 
 ## Browser and Internet Requirements
 
@@ -552,6 +625,48 @@ Third-party libraries included or loaded by the app are governed by their own li
 See the `LICENSE` file and third-party library documentation for details.
 
 ---
+
+
+## Suggested Testing Checklist
+
+Before publishing or sharing a new version, test the following:
+
+### Basic editor
+
+- Open the HTML file in the browser.
+- Confirm the default certificate layout appears.
+- Select text and image objects.
+- Move, resize, lock, hide, duplicate, and delete objects.
+- Save and reload JSON layout.
+
+### Image editing
+
+- Upload an image.
+- Replace the selected image.
+- Use **Tách nền AI**.
+- Use **Crop sát chủ thể**.
+- Use **Khôi phục ảnh gốc**.
+- Test rotate, flip, brightness, contrast, saturation, blend mode, and shadow.
+- Test **Bo góc**.
+- Test **Mask hình tròn**.
+- Test **Viền ảnh**, **Màu viền**, and **Độ dày viền**.
+- Save JSON and reload it to confirm image settings are preserved.
+
+### Batch export
+
+- Upload an Excel / CSV / TXT file.
+- Confirm columns are detected.
+- Map fields to text objects.
+- Preview data.
+- Export ZIP.
+- Check exported certificate values and file names.
+
+### Export
+
+- Export PNG.
+- Export JPG.
+- Test A4 300 DPI.
+- Confirm selection outlines do not appear in exported images.
 
 ## Disclaimer
 
