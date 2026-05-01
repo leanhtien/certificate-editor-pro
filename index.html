@@ -259,12 +259,20 @@
       line-height: 1.25;
     }
 
+    .image-object {
+      overflow: hidden;
+    }
+
     .image-object img {
       display: block;
       width: 100%;
       height: 100%;
       object-fit: contain;
       pointer-events: none;
+    }
+
+    .image-object.circle-mask img {
+      object-fit: cover;
     }
 
     .guide {
@@ -632,10 +640,12 @@
           <label>Tùy chọn ảnh</label>
           <label class="checkbox-inline"><input type="checkbox" id="objKeepRatio" checked /> Giữ đúng tỉ lệ ảnh khi chỉnh rộng / cao</label>
           <div class="muted tight">Nên bật với logo, con dấu, line trang trí để tránh méo ảnh.</div>
+
           <div class="btn-row" style="margin-top:10px">
             <button class="btn-secondary small" id="cropImageBtn" type="button">Crop sát chủ thể</button>
             <button class="btn-secondary small" id="resetImageAdjustBtn" type="button">Reset chỉnh ảnh</button>
           </div>
+
           <div class="row" style="margin-top:10px">
             <div class="field">
               <label>Góc xoay</label>
@@ -652,10 +662,12 @@
               </select>
             </div>
           </div>
+
           <div class="row">
             <div class="field"><label class="checkbox-inline"><input type="checkbox" id="objFlipX" /> Lật ngang</label></div>
             <div class="field"><label class="checkbox-inline"><input type="checkbox" id="objFlipY" /> Lật dọc</label></div>
           </div>
+
           <div class="field">
             <label>Độ sáng <span id="brightnessValue" class="mini">100%</span></label>
             <input type="range" id="objBrightness" min="0" max="200" value="100" />
@@ -668,6 +680,7 @@
             <label>Bão hòa <span id="saturationValue" class="mini">100%</span></label>
             <input type="range" id="objSaturation" min="0" max="200" value="100" />
           </div>
+
           <div class="field">
             <label>Bóng đổ</label>
             <select id="objShadowPreset">
@@ -678,7 +691,27 @@
               <option value="signature">Bóng chữ ký</option>
             </select>
           </div>
-          <div class="muted tight">Gợi ý: chữ ký / con dấu nên dùng Multiply + Bóng nhẹ. Logo có thể dùng Overlay hoặc giữ Thường.</div>
+
+          <div class="field">
+            <label>Bo góc <span id="borderRadiusValue" class="mini">0px</span></label>
+            <input type="range" id="objBorderRadius" min="0" max="120" value="0" />
+          </div>
+          <div class="row">
+            <div class="field"><label class="checkbox-inline"><input type="checkbox" id="objCircleMask" /> Mask hình tròn</label></div>
+            <div class="field"><label class="checkbox-inline"><input type="checkbox" id="objBorderEnabled" /> Viền ảnh</label></div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Màu viền</label>
+              <input type="color" id="objBorderColor" value="#ffffff" />
+            </div>
+            <div class="field">
+              <label>Độ dày viền <span id="borderWidthValue" class="mini">0px</span></label>
+              <input type="range" id="objBorderWidth" min="0" max="24" value="0" />
+            </div>
+          </div>
+
+          <div class="muted tight">Gợi ý: chữ ký / con dấu nên dùng Multiply + Bóng nhẹ. Ảnh chân dung có thể dùng mask hình tròn + viền nhẹ.</div>
         </div>
         <div class="row">
           <div class="field">
@@ -960,6 +993,7 @@
       objZ: document.getElementById('objZ'),
       objOpacity: document.getElementById('objOpacity'),
       objKeepRatio: document.getElementById('objKeepRatio'),
+
       objRotate: document.getElementById('objRotate'),
       objFlipX: document.getElementById('objFlipX'),
       objFlipY: document.getElementById('objFlipY'),
@@ -968,6 +1002,12 @@
       objSaturation: document.getElementById('objSaturation'),
       objShadowPreset: document.getElementById('objShadowPreset'),
       objBlendMode: document.getElementById('objBlendMode'),
+
+      objBorderRadius: document.getElementById('objBorderRadius'),
+      objCircleMask: document.getElementById('objCircleMask'),
+      objBorderEnabled: document.getElementById('objBorderEnabled'),
+      objBorderColor: document.getElementById('objBorderColor'),
+      objBorderWidth: document.getElementById('objBorderWidth'),
     };
 
 
@@ -1244,6 +1284,7 @@
         if (!('backgroundRemoved' in obj)) obj.backgroundRemoved = false;
         if (!('processedSrc' in obj)) obj.processedSrc = obj.backgroundRemoved ? (obj.src || '') : '';
         if (!('originalSrc' in obj)) obj.originalSrc = '';
+
         if (!('rotate' in obj)) obj.rotate = 0;
         if (!('flipX' in obj)) obj.flipX = false;
         if (!('flipY' in obj)) obj.flipY = false;
@@ -1252,6 +1293,12 @@
         if (!('saturation' in obj)) obj.saturation = 100;
         if (!('shadowPreset' in obj)) obj.shadowPreset = 'none';
         if (!('blendMode' in obj)) obj.blendMode = 'normal';
+
+        if (!('borderRadius' in obj)) obj.borderRadius = 0;
+        if (!('circleMask' in obj)) obj.circleMask = false;
+        if (!('borderEnabled' in obj)) obj.borderEnabled = false;
+        if (!('borderColor' in obj)) obj.borderColor = '#ffffff';
+        if (!('borderWidth' in obj)) obj.borderWidth = 0;
       }
       return obj;
     }
@@ -1771,6 +1818,8 @@
         el.style.filter = '';
         el.style.mixBlendMode = 'normal';
         el.style.boxShadow = 'none';
+        el.style.borderRadius = '0';
+        el.style.border = 'none';
         el.style.transform = 'none';
 
         const base = obj.color || '#173d7a';
@@ -1818,10 +1867,18 @@
         el.style.transformOrigin = 'center center';
         el.style.transform = `rotate(${Number(obj.rotate || 0)}deg) scale(${scaleX}, ${scaleY})`;
         el.style.mixBlendMode = obj.blendMode || 'normal';
+
         const bright = Number(obj.brightness || 100);
         const contrast = Number(obj.contrast || 100);
         const saturation = Number(obj.saturation || 100);
         el.style.filter = `brightness(${bright}%) contrast(${contrast}%) saturate(${saturation}%)`;
+
+        el.classList.toggle('circle-mask', !!obj.circleMask);
+        el.style.borderRadius = obj.circleMask ? '50%' : `${Number(obj.borderRadius || 0)}px`;
+        el.style.border = (obj.borderEnabled && Number(obj.borderWidth || 0) > 0)
+          ? `${Number(obj.borderWidth || 0)}px solid ${obj.borderColor || '#ffffff'}`
+          : 'none';
+
         switch (obj.shadowPreset) {
           case 'soft':
             el.style.boxShadow = '0 8px 20px rgba(15,23,42,.12)';
@@ -1879,7 +1936,7 @@
       const actionButtons = ['toggleLockBtn','toggleVisibilityBtn','bringForwardBtn','sendBackwardBtn','duplicateBtn','deleteBtn'];
       if (!obj) {
         actionButtons.forEach(id => document.getElementById(id)?.setAttribute('disabled', 'disabled'));
-        ['changeImageBtn','fitImageBtn','removeImageBgBtn','restoreImageOriginalBtn'].forEach(id => document.getElementById(id)?.setAttribute('disabled', 'disabled'));
+        ['changeImageBtn','fitImageBtn','removeImageBgBtn','restoreImageOriginalBtn','cropImageBtn','resetImageAdjustBtn'].forEach(id => document.getElementById(id)?.setAttribute('disabled', 'disabled'));
         if (!backgroundRemovalBusy) setImageProcessingStatus('', '');
         return;
       }
@@ -1916,6 +1973,7 @@
       fields.objOpacity.value = Math.round((obj.opacity ?? 1) * 100);
       document.getElementById('opacityValue').textContent = fields.objOpacity.value + '%';
       if (fields.objKeepRatio) fields.objKeepRatio.checked = obj.keepAspectRatio !== false;
+
       if (fields.objRotate) fields.objRotate.value = Math.round(obj.rotate || 0);
       if (fields.objFlipX) fields.objFlipX.checked = !!obj.flipX;
       if (fields.objFlipY) fields.objFlipY.checked = !!obj.flipY;
@@ -1924,9 +1982,18 @@
       if (fields.objSaturation) fields.objSaturation.value = Math.round(obj.saturation || 100);
       if (fields.objShadowPreset) fields.objShadowPreset.value = obj.shadowPreset || 'none';
       if (fields.objBlendMode) fields.objBlendMode.value = obj.blendMode || 'normal';
+
+      if (fields.objBorderRadius) fields.objBorderRadius.value = Math.round(obj.borderRadius || 0);
+      if (fields.objCircleMask) fields.objCircleMask.checked = !!obj.circleMask;
+      if (fields.objBorderEnabled) fields.objBorderEnabled.checked = !!obj.borderEnabled;
+      if (fields.objBorderColor) fields.objBorderColor.value = obj.borderColor || '#ffffff';
+      if (fields.objBorderWidth) fields.objBorderWidth.value = Math.round(obj.borderWidth || 0);
+
       const brightnessValue = document.getElementById('brightnessValue'); if (brightnessValue) brightnessValue.textContent = `${fields.objBrightness?.value || 100}%`;
       const contrastValue = document.getElementById('contrastValue'); if (contrastValue) contrastValue.textContent = `${fields.objContrast?.value || 100}%`;
       const saturationValue = document.getElementById('saturationValue'); if (saturationValue) saturationValue.textContent = `${fields.objSaturation?.value || 100}%`;
+      const borderRadiusValue = document.getElementById('borderRadiusValue'); if (borderRadiusValue) borderRadiusValue.textContent = `${fields.objBorderRadius?.value || 0}px`;
+      const borderWidthValue = document.getElementById('borderWidthValue'); if (borderWidthValue) borderWidthValue.textContent = `${fields.objBorderWidth?.value || 0}px`;
 
       fields.objFontSize.disabled = !isText || obj.locked;
       fields.objColor.disabled = !isText || obj.locked;
@@ -1939,8 +2006,10 @@
       fields.objEffectColor.disabled = !isText || obj.locked;
       if (fields.objTintColor) fields.objTintColor.disabled = !(isImage && obj.templateId) || obj.locked;
       if (fields.objKeepRatio) fields.objKeepRatio.disabled = !isImage || obj.locked;
-      ['objRotate','objBrightness','objContrast','objSaturation','objShadowPreset','objBlendMode'].forEach(key => fields[key] && (fields[key].disabled = !isImage || obj.locked));
-      ['objFlipX','objFlipY'].forEach(key => fields[key] && (fields[key].disabled = !isImage || obj.locked));
+      ['objRotate','objBrightness','objContrast','objSaturation','objShadowPreset','objBlendMode','objBorderRadius','objBorderColor','objBorderWidth'].forEach(key => fields[key] && (fields[key].disabled = !isImage || obj.locked || !!obj.templateId));
+      ['objFlipX','objFlipY','objCircleMask','objBorderEnabled'].forEach(key => fields[key] && (fields[key].disabled = !isImage || obj.locked || !!obj.templateId));
+      if (fields.objBorderColor) fields.objBorderColor.disabled = !isImage || obj.locked || !!obj.templateId || !obj.borderEnabled;
+      if (fields.objBorderWidth) fields.objBorderWidth.disabled = !isImage || obj.locked || !!obj.templateId || !obj.borderEnabled;
       ['objName','objText','objX','objY','objW','objH','objZ','objOpacity'].forEach(key => fields[key].disabled = obj.locked);
 
       document.getElementById('toggleLockBtn').textContent = obj.locked ? 'Mở khóa đối tượng' : 'Khóa đối tượng';
@@ -2020,9 +2089,26 @@
         obj.saturation = clamp(Number(fields.objSaturation?.value || 100), 0, 200);
         obj.shadowPreset = fields.objShadowPreset?.value || 'none';
         obj.blendMode = fields.objBlendMode?.value || 'normal';
+
+        obj.borderRadius = clamp(Number(fields.objBorderRadius?.value || 0), 0, 120);
+        obj.circleMask = !!fields.objCircleMask?.checked;
+        if (obj.circleMask) {
+          const size = Math.max(10, Math.min(obj.w || 10, obj.h || 10));
+          obj.w = size;
+          obj.h = size;
+          fields.objW.value = obj.w;
+          fields.objH.value = obj.h;
+        }
+        obj.borderEnabled = !!fields.objBorderEnabled?.checked;
+        obj.borderColor = fields.objBorderColor?.value || '#ffffff';
+        obj.borderWidth = clamp(Number(fields.objBorderWidth?.value || 0), 0, 24);
+
         const brightnessValue = document.getElementById('brightnessValue'); if (brightnessValue) brightnessValue.textContent = `${obj.brightness}%`;
         const contrastValue = document.getElementById('contrastValue'); if (contrastValue) contrastValue.textContent = `${obj.contrast}%`;
         const saturationValue = document.getElementById('saturationValue'); if (saturationValue) saturationValue.textContent = `${obj.saturation}%`;
+        const borderRadiusValue = document.getElementById('borderRadiusValue'); if (borderRadiusValue) borderRadiusValue.textContent = `${obj.borderRadius}px`;
+        const borderWidthValue = document.getElementById('borderWidthValue'); if (borderWidthValue) borderWidthValue.textContent = `${obj.borderWidth}px`;
+
         if (obj.templateId) {
           obj.tint = fields.objTintColor.value;
           obj.src = getOrnamentSrc(obj.templateId, obj.tint);
@@ -2350,6 +2436,94 @@
       setImageProcessingStatus('Đã khôi phục lại ảnh gốc có nền.', 'success');
     }
 
+    async function cropSelectedImageToVisibleBounds() {
+      const obj = getSelected();
+      if (!obj || obj.type !== 'image') { alert('Hãy chọn một đối tượng ảnh trước.'); return; }
+      if (obj.locked) { alert('Đối tượng này đang bị khóa.'); return; }
+      if (obj.templateId) { alert('Line / họa tiết SVG không cần crop theo chủ thể.'); return; }
+      try {
+        const image = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = obj.src;
+        });
+        const canvas = document.createElement('canvas');
+        canvas.width = image.naturalWidth || image.width;
+        canvas.height = image.naturalHeight || image.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0);
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let minX = canvas.width, minY = canvas.height, maxX = -1, maxY = -1;
+
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            const alpha = data[(y * canvas.width + x) * 4 + 3];
+            if (alpha > 8) {
+              if (x < minX) minX = x;
+              if (y < minY) minY = y;
+              if (x > maxX) maxX = x;
+              if (y > maxY) maxY = y;
+            }
+          }
+        }
+
+        if (maxX < 0 || maxY < 0) { alert('Không tìm thấy vùng ảnh hiển thị để crop.'); return; }
+
+        const pad = 2;
+        minX = Math.max(0, minX - pad);
+        minY = Math.max(0, minY - pad);
+        maxX = Math.min(canvas.width - 1, maxX + pad);
+        maxY = Math.min(canvas.height - 1, maxY + pad);
+
+        const cropW = Math.max(1, maxX - minX + 1);
+        const cropH = Math.max(1, maxY - minY + 1);
+        const out = document.createElement('canvas');
+        out.width = cropW;
+        out.height = cropH;
+        out.getContext('2d').drawImage(canvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+
+        obj.src = out.toDataURL('image/png');
+        if (obj.backgroundRemoved) obj.processedSrc = obj.src;
+        obj.naturalWidth = cropW;
+        obj.naturalHeight = cropH;
+
+        if (obj.keepAspectRatio) {
+          const currentW = obj.w || cropW;
+          obj.h = Math.max(10, Math.round(currentW * cropH / cropW));
+          obj.w = currentW;
+        }
+
+        renderAll();
+        syncPanel();
+        setImageProcessingStatus('Đã crop sát chủ thể để loại bỏ khoảng trống dư thừa.', 'success');
+      } catch (err) {
+        console.error(err);
+        alert('Không crop được ảnh đang chọn.');
+      }
+    }
+
+    function resetSelectedImageAdjustments() {
+      const obj = getSelected();
+      if (!obj || obj.type !== 'image') return;
+      obj.rotate = 0;
+      obj.flipX = false;
+      obj.flipY = false;
+      obj.brightness = 100;
+      obj.contrast = 100;
+      obj.saturation = 100;
+      obj.shadowPreset = 'none';
+      obj.blendMode = 'normal';
+      obj.borderRadius = 0;
+      obj.circleMask = false;
+      obj.borderEnabled = false;
+      obj.borderColor = '#ffffff';
+      obj.borderWidth = 0;
+      renderAll();
+      syncPanel();
+      setImageProcessingStatus('Đã reset toàn bộ chỉnh ảnh về mặc định.', 'success');
+    }
+
     function handleImageUpload(file, mode) {
       if (!file) return;
       const reader = new FileReader();
@@ -2387,82 +2561,6 @@
         }
       };
       reader.readAsDataURL(file);
-    }
-
-
-    async function cropSelectedImageToVisibleBounds() {
-      const obj = getSelected();
-      if (!obj || obj.type !== 'image') { alert('Hãy chọn một đối tượng ảnh trước.'); return; }
-      if (obj.locked) { alert('Đối tượng này đang bị khóa.'); return; }
-      if (obj.templateId) { alert('Line / họa tiết SVG không cần crop theo chủ thể.'); return; }
-      try {
-        const source = obj.src;
-        const img = await new Promise((resolve, reject) => {
-          const image = new Image();
-          image.onload = () => resolve(image);
-          image.onerror = reject;
-          image.src = source;
-        });
-        const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth || img.width;
-        canvas.height = img.naturalHeight || img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-        let minX = canvas.width, minY = canvas.height, maxX = -1, maxY = -1;
-        for (let y = 0; y < canvas.height; y++) {
-          for (let x = 0; x < canvas.width; x++) {
-            const alpha = data[(y * canvas.width + x) * 4 + 3];
-            if (alpha > 8) {
-              if (x < minX) minX = x;
-              if (y < minY) minY = y;
-              if (x > maxX) maxX = x;
-              if (y > maxY) maxY = y;
-            }
-          }
-        }
-        if (maxX < 0 || maxY < 0) { alert('Không tìm thấy vùng ảnh hiển thị để crop.'); return; }
-        const pad = 2;
-        minX = Math.max(0, minX - pad); minY = Math.max(0, minY - pad);
-        maxX = Math.min(canvas.width - 1, maxX + pad); maxY = Math.min(canvas.height - 1, maxY + pad);
-        const cropW = Math.max(1, maxX - minX + 1);
-        const cropH = Math.max(1, maxY - minY + 1);
-        const out = document.createElement('canvas');
-        out.width = cropW; out.height = cropH;
-        const outCtx = out.getContext('2d');
-        outCtx.drawImage(canvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
-        obj.src = out.toDataURL('image/png');
-        if (obj.backgroundRemoved) obj.processedSrc = obj.src;
-        obj.naturalWidth = cropW;
-        obj.naturalHeight = cropH;
-        if (obj.keepAspectRatio) {
-          const currentW = obj.w || cropW;
-          obj.h = Math.max(10, Math.round(currentW * cropH / cropW));
-          obj.w = currentW;
-        }
-        renderAll();
-        syncPanel();
-        setImageProcessingStatus('Đã crop sát chủ thể để loại bỏ khoảng trống dư thừa.', 'success');
-      } catch (err) {
-        console.error(err);
-        alert('Không crop được ảnh đang chọn.');
-      }
-    }
-
-    function resetSelectedImageAdjustments() {
-      const obj = getSelected();
-      if (!obj || obj.type !== 'image') return;
-      obj.rotate = 0;
-      obj.flipX = false;
-      obj.flipY = false;
-      obj.brightness = 100;
-      obj.contrast = 100;
-      obj.saturation = 100;
-      obj.shadowPreset = 'none';
-      obj.blendMode = 'normal';
-      renderAll();
-      syncPanel();
-      setImageProcessingStatus('Đã reset toàn bộ chỉnh ảnh về mặc định.', 'success');
     }
 
     document.getElementById('bgUpload')?.addEventListener('change', (e) => handleImageUpload(e.target.files[0], 'background'));
